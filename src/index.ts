@@ -1,7 +1,8 @@
 import { Elysia } from 'elysia';
 import { Jetstream } from '@skyware/jetstream';
 
-import { addLikePair, getHandle } from './cache';
+import { queueLikePairForQuery, getHandle } from './cache';
+import { trackLike } from './morat';
 
 // A couple of known DIDs:
 // pfrazee.com -> did:plc:ragtjsm2j2vknwkz3zp4oxrd
@@ -28,7 +29,8 @@ jetstream.onCreate('app.bsky.feed.post', async (event) => {
 
 jetstream.onCreate('app.bsky.feed.like', async (event) => {
 	const likedRepo = event.commit.record.subject.uri.split('/')[2];
-	addLikePair(event.did, likedRepo);
+	queueLikePairForQuery(event.did, likedRepo);
+	trackLike(event.did, likedRepo);
 });
 
 console.log('🦋 Jetstream is running');
@@ -37,7 +39,7 @@ jetstream.start();
 // Workaround for bun issues
 jetstream.ws!.binaryType = 'arraybuffer';
 
-const app = new Elysia().get('/', () => 'Hello Elysia').listen(3000);
+const app = new Elysia().get('/', () => 'Hello Elysia').listen(3033);
 
 console.log(
 	`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

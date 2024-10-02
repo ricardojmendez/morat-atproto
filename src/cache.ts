@@ -32,6 +32,7 @@ type LikePair = {
 const likePairs: LikePair[] = [];
 
 const INITIAL_BACK_OFF_TIME = 5000;
+const MAX_BACK_OFF_TIME = 15 * 60 * 1000;
 const BACK_OFF_INCREASE = 2;
 
 // Anything above 10 seems to get us rate-limited fairly quickly
@@ -76,7 +77,10 @@ export async function processLikePairs() {
 		if (lastBackOffPeriod === 0) {
 			lastBackOffPeriod = INITIAL_BACK_OFF_TIME;
 		} else {
-			lastBackOffPeriod *= BACK_OFF_INCREASE;
+			lastBackOffPeriod = Math.min(
+				MAX_BACK_OFF_TIME,
+				lastBackOffPeriod * BACK_OFF_INCREASE
+			);
 		}
 		backoffDeadline = Date.now() + lastBackOffPeriod;
 		console.warn(
@@ -95,7 +99,7 @@ export async function processLikePairs() {
 	isProcessing = false;
 }
 
-export function addLikePair(liker: string, liked: string) {
+export function queueLikePairForQuery(liker: string, liked: string) {
 	likePairs.push({ liker, liked });
 }
 
