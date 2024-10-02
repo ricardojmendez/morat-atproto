@@ -16,16 +16,20 @@ Everything in Morat remains the same other than the epoch length change and tota
 
 ## TODO
 
-- [ ] Subscribe to ATProto Like feed
+- [x]  Subscribe to ATProto Like feed
 - [ ] Subscribe to ATProto Post feed
-- [ ] Get the associated label for a user DID
-	- [ ] Cache label locally
+- [x] Get the associated label for a user DID
+	- [x] Cache label locally
 	- [ ] If either sender or recipient do not exist, create them based on the label (we will not update later for now)
 - [ ] Get a creator for an associated post DID
 	- [ ] Potentially cache the associated creator for a DID
 - [ ] Integrate Like events with Morat
 - [ ] Integrate Post events with Morat
 
+
+## WIP Notes
+
+- While I am successfully querying for the user handles, I get rate-limited if I attempt to get them at the speed that they are actually coming in. This means there will be some events for which we are likely to not have a human-readable handle. It's best to track things based on the DID, and then add a display label for those for which we do know the handle.
 
 
 ## Development
