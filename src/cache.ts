@@ -24,12 +24,7 @@ function insertHandle(did: string, handle: string) {
 	}
 }
 
-type LikePair = {
-	liker: string;
-	liked: string;
-};
-
-const likePairs: LikePair[] = [];
+const toRetrieve = new Set<string>();
 
 const INITIAL_BACK_OFF_TIME = 5000;
 const MAX_BACK_OFF_TIME = 15 * 60 * 1000;
@@ -51,24 +46,23 @@ export async function processLikePairs() {
 	}
 	isProcessing = true;
 
-	let fetchCount = 0;
 	let anyFailed = false;
 
-	const processPair = async (pair: LikePair) => {
-		const liker = await getHandle(pair.liker);
-		const liked = await getHandle(pair.liked);
+	const retrieved = new Set<string>();
+	const processDID = async (did: string) => {
+		const handle = await getOrCreateHandle(did);
 
-		if (!liker || !liked) {
+		if (!handle) {
 			// We are likely getting rate-limited - backoff
 			anyFailed = true;
 		} else {
-			fetchCount++;
-			console.log(`💖: ${liker} -> ${liked}`);
+			console.debug(` . 🗂️ handle ${did} -> ${handle}`);
+			retrieved.add(did);
 		}
 	};
 
-	const pairsToProcess = likePairs.slice(0, FETCH_BATCH_SIZE);
-	await Promise.all(pairsToProcess.map(processPair));
+	const didsToProcess = Array.from(toRetrieve).slice(0, FETCH_BATCH_SIZE);
+	await Promise.all(didsToProcess.map(processDID));
 
 	// Yes, there are several reasons why this retrieval could fail, and we
 	// should likely check the reason and return a different status, but this
@@ -90,24 +84,39 @@ export async function processLikePairs() {
 		lastBackOffPeriod = 0;
 	}
 
-	if (fetchCount > 0) {
-		// Yes, this is quick and dirty, and there is a change the elements above
-		// will not fail sequentially and we'll remove some we haven't actually gotten
-		// a handle for. This is a PoC.
-		likePairs.splice(0, fetchCount);
+	for (const did of retrieved) {
+		toRetrieve.delete(did);
 	}
 	isProcessing = false;
 }
 
 export function queueLikePairForQuery(liker: string, liked: string) {
-	likePairs.push({ liker, liked });
+	if (!getHandle(liker)) {
+		toRetrieve.add(liker);
+	}
+	if (!getHandle(liked)) {
+		toRetrieve.add(liked);
+	}
 }
 
-export async function getHandle(did: string): Promise<string | undefined> {
+export function getHandle(did: string): string | undefined {
 	let handle: string | undefined = undefined;
 
 	const dbHandle = getHandleQuery.get(did);
 	if (dbHandle) {
+		// @ts-ignore
+		handle = dbHandle.handle;
+		// console.debug(`Got handle from cache for ${did}: ${handle}`);
+	}
+	return handle;
+}
+
+export async function getOrCreateHandle(
+	did: string
+): Promise<string | undefined> {
+	let handle = getHandle(did);
+
+	if (handle) {
 		// @ts-ignore
 		handle = dbHandle.handle;
 		// console.debug(`Got handle from cache for ${did}: ${handle}`);

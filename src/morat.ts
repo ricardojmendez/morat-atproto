@@ -30,6 +30,8 @@ async function giveLikePoints(likerDID: string, likedDID: string) {
 	if (!assignResp.ok) {
 		console.error(`Failed to assign points from ${likerDID} to ${likedDID}`);
 		console.error(` . ${assignResp.status} ${assignResp.statusText}`);
+	} else {
+		console.log(`💖: ${likerDID} -> ${likedDID}`);
 	}
 }
 
