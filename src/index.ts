@@ -11,7 +11,11 @@ import { trackLike } from './morat';
 console.log(`Handle: ${await getHandle('did:plc:ragtjsm2j2vknwkz3zp4oxrd')}`);
 console.log(`Handle: ${await getHandle('did:plc:cf6futaebyc2k4wgzsr4v42k')}`);
 console.log(`Handle: ${await getHandle('did:plc:cf6futaebyc2k4wgzsr4v42k')}`);
+
 // console.log(JSON.stringify(resp));
+
+const MAX_DATA_PAUSE = 5000;
+let lastDataInput = Date.now();
 
 // const jetstream = new Jetstream({ endpoint: "ws://localhost:6008/subscribe" });
 const jetstream = new Jetstream({
@@ -28,6 +32,7 @@ jetstream.onCreate('app.bsky.feed.post', async (event) => {
 });
 
 jetstream.onCreate('app.bsky.feed.like', async (event) => {
+	lastDataInput = Date.now();
 	const likedRepo = event.commit.record.subject.uri.split('/')[2];
 	queueLikePairForQuery(event.did, likedRepo);
 	trackLike(event.did, likedRepo);
@@ -36,6 +41,15 @@ jetstream.onCreate('app.bsky.feed.like', async (event) => {
 console.log('🦋 Jetstream is running');
 
 jetstream.start();
+
+setInterval(() => {
+	if (Date.now() - lastDataInput > MAX_DATA_PAUSE) {
+		console.error('🚨 No data input for a while, restarting Jetstream');
+		jetstream.close();
+		jetstream.start();
+	}
+}, MAX_DATA_PAUSE);
+
 // Workaround for bun issues
 jetstream.ws!.binaryType = 'arraybuffer';
 
