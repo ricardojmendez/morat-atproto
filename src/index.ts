@@ -10,9 +10,6 @@ import { trackLike } from './morat';
 
 console.log(`Handle: ${await getHandle('did:plc:ragtjsm2j2vknwkz3zp4oxrd')}`);
 console.log(`Handle: ${await getHandle('did:plc:cf6futaebyc2k4wgzsr4v42k')}`);
-console.log(`Handle: ${await getHandle('did:plc:cf6futaebyc2k4wgzsr4v42k')}`);
-
-// console.log(JSON.stringify(resp));
 
 const MAX_DATA_PAUSE = 5000;
 let lastDataInput = Date.now();

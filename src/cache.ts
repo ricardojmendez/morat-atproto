@@ -38,10 +38,10 @@ let backoffDeadline = 0;
 let isProcessing = false;
 let lastBackOffPeriod = 0;
 
-setInterval(processLikePairs, BATCH_FREQUENCY);
+setInterval(retrieveHandles, BATCH_FREQUENCY);
 
-export async function processLikePairs() {
-	if (isProcessing || Date.now() < backoffDeadline) {
+export async function retrieveHandles() {
+	if (isProcessing || Date.now() < backoffDeadline || toRetrieve.size === 0) {
 		return;
 	}
 	isProcessing = true;
@@ -61,7 +61,9 @@ export async function processLikePairs() {
 		}
 	};
 
+	console.log('Starting handle retrieval...');
 	const didsToProcess = Array.from(toRetrieve).slice(0, FETCH_BATCH_SIZE);
+	console.log(`Retrieving ${didsToProcess.length} handles...`);
 	await Promise.all(didsToProcess.map(processDID));
 
 	// Yes, there are several reasons why this retrieval could fail, and we
