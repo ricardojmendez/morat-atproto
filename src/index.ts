@@ -1,4 +1,3 @@
-import { Elysia } from 'elysia';
 import { Jetstream } from '@skyware/jetstream';
 
 import { queueLikePairForQuery, getHandle } from './cache';
@@ -49,9 +48,3 @@ setInterval(() => {
 
 // Workaround for bun issues
 jetstream.ws!.binaryType = 'arraybuffer';
-
-const app = new Elysia().get('/', () => 'Hello Elysia').listen(3033);
-
-console.log(
-	`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
