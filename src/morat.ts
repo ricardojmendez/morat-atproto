@@ -2,6 +2,8 @@ const moratUrl = 'http://localhost:3000';
 
 const POINTS_ON_LIKE = 25;
 
+const seenDIDs = new Set<string>();
+
 async function registerDID(did: string) {
 	// console.log(`Registering DID ${did} ${encodeURIComponent(did)}`);
 	const response = await fetch(`${moratUrl}/user/${encodeURIComponent(did)}`, {
@@ -36,7 +38,14 @@ async function giveLikePoints(likerDID: string, likedDID: string) {
 }
 
 export async function trackLike(likerDID: string, likedDID: string) {
-	await registerDID(likerDID);
-	await registerDID(likedDID);
+	const promises = [];
+	for (const did of [likerDID, likedDID]) {
+		if (!seenDIDs.has(did)) {
+			promises.push(registerDID(did));
+			seenDIDs.add(did);
+		}
+	}
+
+	await Promise.all(promises);
 	await giveLikePoints(likerDID, likedDID);
 }
