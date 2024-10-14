@@ -34,17 +34,19 @@ jetstream.onCreate('app.bsky.feed.like', async (event) => {
 	trackLike(event.did, likedRepo);
 });
 
-console.log('🦋 Jetstream is running');
-
-jetstream.start();
+const connect = () => {
+	jetstream.start();
+	// Workaround for bun issues
+	jetstream.ws!.binaryType = 'arraybuffer';
+	console.log('🦋 Jetstream is running');
+};
 
 setInterval(() => {
 	if (Date.now() - lastDataInput > MAX_DATA_PAUSE) {
 		console.error('🚨 No data input for a while, restarting Jetstream');
 		jetstream.close();
-		jetstream.start();
+		connect();
 	}
 }, MAX_DATA_PAUSE);
 
-// Workaround for bun issues
-jetstream.ws!.binaryType = 'arraybuffer';
+connect();
