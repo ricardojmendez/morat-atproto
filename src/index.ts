@@ -19,15 +19,7 @@ const jetstream = new Jetstream({
 	wantedCollections: ['app.bsky.feed.like'],
 });
 
-jetstream.onCreate('app.bsky.feed.post', async (event) => {
-	return;
-	const handle = await getHandle(event.did);
-
-	console.log(`✍🏻 ${handle} \t ${event.commit.record.text}`);
-	// \n${JSON.stringify(event)}
-});
-
-jetstream.onCreate('app.bsky.feed.like', async (event) => {
+jetstream.onCreate('app.bsky.feed.like', (event) => {
 	lastDataInput = Date.now();
 	const likedRepo = event.commit.record.subject.uri.split('/')[2];
 	queueLikePairForQuery(event.did, likedRepo);
