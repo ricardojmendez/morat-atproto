@@ -11,7 +11,7 @@
 
   },
   "dependencies": {
-    "@skyware/jetstream": "^0.1.9",
+    "@skyware/jetstream": "^0.2.0",
     "dotenv": "^16.4.5",
     "prettier": "^3.3.3"
   },
