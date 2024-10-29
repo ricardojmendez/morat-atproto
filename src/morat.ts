@@ -5,35 +5,68 @@ const POINTS_ON_LIKE = 25;
 const seenDIDs = new Set<string>();
 
 async function registerDID(did: string) {
-	// console.log(`Registering DID ${did} ${encodeURIComponent(did)}`);
-	const response = await fetch(`${moratUrl}/user/${encodeURIComponent(did)}`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({}),
-	});
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
 
-	// We will always try to create users, since Morat currently runs in-memory
-	// and it may have been reset.
-	if (response.status === 200) {
-		const body = await response.json();
-		// console.log(body);
-		console.log(` . Created user ${did} epoch ${body.epochSignUp}`);
+	try {
+		const response = await fetch(
+			`${moratUrl}/user/${encodeURIComponent(did)}`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({}),
+				signal: controller.signal,
+			}
+		);
+
+		if (response.status === 200) {
+			const body = await response.json();
+			console.log(` . Created user ${did} epoch ${body.epochSignUp}`);
+		}
+	} catch (error) {
+		if (error instanceof Error && error.name === 'AbortError') {
+			console.error(`Request to register DID ${did} timed out`);
+		} else {
+			console.error(`Failed to register DID ${did}:`, error);
+		}
+	} finally {
+		clearTimeout(timeoutId);
 	}
 }
 
 async function giveLikePoints(likerDID: string, likedDID: string) {
-	const assignResp = await fetch(
-		`${moratUrl}/points/transfer/${encodeURIComponent(likerDID)}/${encodeURIComponent(likedDID)}/${POINTS_ON_LIKE}`,
-		{
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5 seconds timeout
+
+	try {
+		const assignResp = await fetch(
+			`${moratUrl}/points/transfer/${encodeURIComponent(likerDID)}/${encodeURIComponent(likedDID)}/${POINTS_ON_LIKE}`,
+			{
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				signal: controller.signal,
+			}
+		);
+
+		if (!assignResp.ok) {
+			console.error(`Failed to assign points from ${likerDID} to ${likedDID}`);
+			console.error(` . ${assignResp.status} ${assignResp.statusText}`);
+		} else {
+			console.log(`💖: ${likerDID} -> ${likedDID}`);
 		}
-	);
-	if (!assignResp.ok) {
-		console.error(`Failed to assign points from ${likerDID} to ${likedDID}`);
-		console.error(` . ${assignResp.status} ${assignResp.statusText}`);
-	} else {
-		console.log(`💖: ${likerDID} -> ${likedDID}`);
+	} catch (error) {
+		if (error instanceof Error && error.name === 'AbortError') {
+			console.error(
+				`Request to assign points from ${likerDID} to ${likedDID} timed out`
+			);
+		} else {
+			console.error(
+				`Failed to assign points from ${likerDID} to ${likedDID}:`,
+				error
+			);
+		}
+	} finally {
+		clearTimeout(timeoutId);
 	}
 }
 
