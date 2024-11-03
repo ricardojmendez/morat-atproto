@@ -30,8 +30,6 @@ See *Point Amounts and distribution* below.
 - [ ] Integrate Post events with Morat
 
 
-## WIP Notes
-
 ### Handle caching
 
 While I am successfully querying for the user handles, I get rate-limited if I attempt to get them at the speed that they are actually coming in. This means there will be some events for which we are likely to not have a human-readable handle. It's best to track things based on the DID, and then add a display label for those for which we do know the handle.
@@ -58,9 +56,22 @@ That means 7-day epochs and 100k as the basic number of points.
 
 
 ## Development
+
 To start the development server run:
+
 ```bash
 bun run dev --watch
 ```
 
 Open http://localhost:3000/ with your browser to see the result.
+
+### Environment configuration
+
+If you want to retrieve the handle attached to a DID, you will need a BlueSky identifier and password.  Set these up under `IDENTIFIER` and `PASSWORD` on the environment variables.
+
+```
+IDENTIFIER="your-app-username.bsky.social"
+PASSWORD="the-app-password"
+```
+
+This doesn't need to be you main user account - you can create an independent account for your test application.

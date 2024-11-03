@@ -1,4 +1,4 @@
-import { getProfile } from './api';
+import { isLoggedIn, getProfile } from './api';
 import { Database } from 'bun:sqlite';
 
 const db = new Database('handles.sqlite', { create: true });
@@ -123,7 +123,7 @@ export async function getOrCreateHandle(
 		handle = dbHandle.handle;
 		// console.debug(`Got handle from cache for ${did}: ${handle}`);
 	}
-	if (!handle) {
+	if (!handle && isLoggedIn) {
 		try {
 			const data = await getProfile(did);
 			handle = data.handle;

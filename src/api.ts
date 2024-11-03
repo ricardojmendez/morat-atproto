@@ -3,15 +3,25 @@ import { XRPC, CredentialManager } from '@atcute/client';
 
 dotenv.config();
 
+const identifier = process.env.IDENTIFIER;
+const password = process.env.PASSWORD;
+
 const manager = new CredentialManager({ service: 'https://bsky.social' });
 const rpc = new XRPC({ handler: manager });
-await manager.login({
-	identifier: process.env.IDENTIFIER,
-	password: process.env.PASSWORD,
-});
+
+if (identifier && password) {
+	await manager.login({
+		identifier,
+		password,
+	});
+}
+
+export const isLoggedIn = manager.session;
 
 if (!manager.session) {
-	console.error(`There was an error logging in as ${process.env.IDENTIFIER}`);
+	console.error(
+		`There was an error logging in as ${process.env.IDENTIFIER}.\nHave you set the IDENTIFIER and PASSWORD environment variables?`
+	);
 }
 
 /**
