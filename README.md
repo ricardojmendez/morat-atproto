@@ -23,10 +23,10 @@ See *Point Amounts and distribution* below.
 - [ ] Subscribe to ATProto Post feed
 - [x] Get the associated label for a user DID
 	- [x] Cache label locally
-	- [ ] If either sender or recipient do not exist, create them based on the label (we will not update later for now)
+	- [x] If either sender or recipient do not exist, create them based on the DID
 - [ ] Get a creator for an associated post DID
-	- [ ] Potentially cache the associated creator for a DID
-- [ ] Integrate Like events with Morat
+	- [x] Potentially cache the associated creator for a DID
+- [x] Integrate Like events with Morat
 - [ ] Integrate Post events with Morat
 
 
@@ -62,8 +62,6 @@ To start the development server run:
 ```bash
 bun run dev --watch
 ```
-
-Open http://localhost:3000/ with your browser to see the result.
 
 ### Environment configuration
 
