@@ -6,7 +6,7 @@ const seenDIDs = new Set<string>();
 
 async function registerDID(did: string) {
 	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
+	const timeoutId = setTimeout(() => controller.abort(), 2000);
 
 	try {
 		const response = await fetch(
@@ -36,7 +36,7 @@ async function registerDID(did: string) {
 
 async function giveLikePoints(likerDID: string, likedDID: string) {
 	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5 seconds timeout
+	const timeoutId = setTimeout(() => controller.abort(), 5000);
 
 	try {
 		const assignResp = await fetch(
