@@ -65,6 +65,8 @@ bun run dev --watch
 
 ### Environment configuration
 
+#### Optional: handle retrieval
+
 If you want to retrieve the handle attached to a DID, you will need a BlueSky identifier and password.  Set these up under `IDENTIFIER` and `PASSWORD` on the environment variables.
 
 ```
