@@ -5,6 +5,8 @@ const POINTS_ON_LIKE = 25;
 const seenDIDs = new Set<string>();
 
 async function registerDID(did: string) {
+	return;
+
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), 2000);
 
@@ -35,6 +37,8 @@ async function registerDID(did: string) {
 }
 
 async function giveLikePoints(likerDID: string, likedDID: string) {
+	console.log(`💖: ${likerDID} -> ${likedDID}`);
+	return;
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), 5000);
 
