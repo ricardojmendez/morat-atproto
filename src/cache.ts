@@ -118,11 +118,6 @@ export async function getOrCreateHandle(
 ): Promise<string | undefined> {
 	let handle = getHandle(did);
 
-	if (handle) {
-		// @ts-ignore
-		handle = dbHandle.handle;
-		// console.debug(`Got handle from cache for ${did}: ${handle}`);
-	}
 	if (!handle && isLoggedIn) {
 		try {
 			const data = await getProfile(did);
